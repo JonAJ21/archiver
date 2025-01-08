@@ -7,7 +7,11 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 add_executable(archiver
     main.cpp
-    src/test.cpp)
+    src/suffix_tree.cpp
+    src/bwt.cpp
+    src/mtf.cpp
+    src/rle.cpp
+    src/sort.cpp)
 
 include_directories(include)
 

@@ -1,10 +1,10 @@
 #include "rle.h"
 
-std::string RLE::encode(const std::string& input) {
-    std::string result;
+std::wstring RLE::encode(const std::wstring& input) {
+    std::wstring result;
     int count = 1;
 
-    std::istringstream iss(input);
+    std::wistringstream iss(input);
     
     int i = 0;
     int index;
@@ -15,14 +15,14 @@ std::string RLE::encode(const std::string& input) {
         if (index == prevIndex) {
             ++count;
         } else {
-            result += std::to_string(count) + ' ' + std::to_string(prevIndex);
+            result += std::to_wstring(count) + L' ' + std::to_wstring(prevIndex);
             count = 1;
             
-            result += '\n';
+            result += L'\n';
             
         }
         if (iss.eof()) {
-            result += std::to_string(count) + ' ' + std::to_string(index);
+            result += std::to_wstring(count) + L' ' + std::to_wstring(index);
         }
         prevIndex = index;
     }
@@ -30,17 +30,17 @@ std::string RLE::encode(const std::string& input) {
     return result;
 }
 
-std::string RLE::decode(const std::string& input) {
-    std::istringstream iss(input);
+std::wstring RLE::decode(const std::wstring& input) {
+    std::wistringstream iss(input);
 
-    std::string result;
+    std::wstring result;
     int count;
     int index;
     while (iss >> count >> index) {
         while (count > 0) {
-            result += std::to_string(index);
+            result += std::to_wstring(index);
             if (!iss.eof() || count > 1) {
-                result += '\n';
+                result += L'\n';
             }
             --count;
         }

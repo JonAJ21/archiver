@@ -11,7 +11,7 @@ add_executable(archiver
     src/bwt.cpp
     src/mtf.cpp
     src/rle.cpp
-    src/sort.cpp)
+    src/huffman.cpp)
 
 include_directories(include)
 

@@ -13,7 +13,7 @@ struct Node {
     Node(Node *link, int start, int *end);
     Node(Node *link, int start, int *end, int ind);
     
-    std::map<char, Node*> children;
+    std::map<wchar_t, Node*> children;
     Node *suffixLink;
     int start;
     int *end;
@@ -24,7 +24,7 @@ struct Node {
 
 class SuffixTree { 
 public: 
-    SuffixTree(const std::string& input);
+    SuffixTree(const std::wstring& input);
     ~SuffixTree();
     std::vector<Node*> getNodesDFS();
 
@@ -36,7 +36,7 @@ private:
     Node *lastCreatedInternalNode = nullptr;
     Node *activeNode = nullptr;
     
-    std::string text;
+    std::wstring text;
 
     int activeEdge = -1;
     int activeLength = 0;

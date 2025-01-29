@@ -14,7 +14,7 @@ Node::Node(Node *link, int start, int *end, int index)
       suffixIndex(index) {}
 
 
-SuffixTree::SuffixTree(const std::string& input) : text(input) {
+SuffixTree::SuffixTree(const std::wstring& input) : text(input) {
     // text += TERMINATION_SYMBOL;
     buildSuffixTree();
 }
@@ -47,7 +47,7 @@ void SuffixTree::buildSuffixTree() {
     }
 }
 
-void SuffixTree::extendSuffixTree(int phase) {
+void SuffixTree::extendSuffixTree(int phase) { 
     lastCreatedInternalNode = nullptr;
     ++leafEnd;
     ++remainingSuffixCount;

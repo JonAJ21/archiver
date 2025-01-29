@@ -1,23 +1,23 @@
 #include "bwt.h"
 #include "suffix_tree.h"
-#include "sort.h"
 
-std::string BWT::encode(const std::string& input) {
-    std::string result = "";
+std::wstring BWT::encode(const std::wstring& input) {
+    std::wstring result = L"";
 
-    std::string text = input + '$';
+    std::wstring text = input + TERMINATION_SYMBOL;
     SuffixTree suffixTree(text);
    
     std::vector<Node*> nodes = suffixTree.getNodesDFS();
-    
+
     for (auto node : nodes) {
         if (node->start == -1) {
             continue;
         }
         char lastChar = text[*(node->end)];
-        if (lastChar == '$') {
+        
+        if (lastChar == TERMINATION_SYMBOL) {
             if (text.size() - node->depth - 1 == -1) {
-                result += '$';
+                result += TERMINATION_SYMBOL;
                 continue;
             }
             result += text[text.size() - node->depth - 1];
@@ -27,18 +27,19 @@ std::string BWT::encode(const std::string& input) {
     return result;
 }
 
-std::string BWT::decode(const std::string& input) {
+std::wstring BWT::decode(const std::wstring& input) {
     int n = input.size();
-    std::vector<int> count(256, 0);
-    std::vector<int> next(n);
-    std::vector<char> sorted_bwt(n);
 
-    for (char c : input) {
+    std::vector<int> count(ALPHABET_LENGTH, 0);
+    std::vector<int> next(n);
+    std::vector<wchar_t> sorted_bwt(n);
+
+    for (wchar_t c : input) {
         count[c]++;
     }
 
-    std::vector<int> first(256, 0);
-    for (int i = 1; i < 256; i++) {
+    std::vector<int> first(ALPHABET_LENGTH, 0);
+    for (int i = 1; i < ALPHABET_LENGTH; i++) {
         first[i] = first[i - 1] + count[i - 1];
     }
 
@@ -47,7 +48,7 @@ std::string BWT::decode(const std::string& input) {
         next[first[input[i]]++] = i;
     }
 
-    std::string original;
+    std::wstring original;
     int index = next[0]; 
     for (int i = 0; i < n; i++) {
         original += sorted_bwt[index];

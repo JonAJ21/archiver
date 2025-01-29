@@ -6,6 +6,6 @@
 
 class RLE final {
 public:
-    static std::string encode(const std::string& input);
-    static std::string decode(const std::string& input);
+    static std::wstring encode(const std::wstring& input);
+    static std::wstring decode(const std::wstring& input);
 };

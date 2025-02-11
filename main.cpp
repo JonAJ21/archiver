@@ -8,11 +8,33 @@
 #include "suffix_tree.h"
 
 int main() {
+    setlocale(LC_ALL, "en_US.UTF-8");
+    
+    std::string input;
+    std::string str;
+    //std::getline(std::wcin, str);
+    while (std::getline(std::cin, str)) {
+        input += str + '\n';
+    }
+    input.pop_back();
+    
+    input += (unsigned char) 255;
 
-    std::string bitsStr = "11111111111";
-    std::bitset<11> bits(bitsStr);
-    std::cout << bits << std::endl;
-    std::cout << bits.to_ulong() << std::endl;
+    std::cout << input << std::endl << std::endl;
+    
+    for (unsigned char ch : input) {
+        std::cout << (int) ch << ' ' << ch << std::endl;
+    }
+    std::cout << "=================" << std::endl;
+    wchar_t c = L'б';
+    std::wcout << (size_t) c << ' ' << c << ' ' << std::bitset<16> (c)<< std::endl;
+
+    
+    //std::cout << sizeof(std::byte) << std::endl;
+    // std::string bitsStr = "11111111111";
+    // std::bitset<1> bits(bitsStr);
+    // std::cout << bits << std::endl;
+    // std::cout << bits.to_ulong() << std::endl;
 
 
 

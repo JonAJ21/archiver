@@ -14,8 +14,7 @@ Node::Node(Node *link, int start, int *end, int index)
       suffixIndex(index) {}
 
 
-SuffixTree::SuffixTree(const std::wstring& input) : text(input) {
-    // text += TERMINATION_SYMBOL;
+SuffixTree::SuffixTree(const std::vector<unsigned char>& input) : text(input) {
     buildSuffixTree();
 }
 

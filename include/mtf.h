@@ -8,9 +8,8 @@
 
 class MTF final {
 private:
-    static const size_t ALPHABET_LENGTH = 2048;
-    static std::vector<wchar_t> getAlphabet();
+    static std::vector<unsigned char> getAlphabet();
 public:
-    static std::wstring encode(const std::wstring& input);
-    static std::wstring decode(const std::wstring& input);
+    static std::vector<unsigned char> encode(const std::vector<unsigned char>& input);
+    static std::vector<unsigned char> decode(const std::vector<unsigned char>& input);
 };

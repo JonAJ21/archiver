@@ -1,15 +1,12 @@
 #pragma once
 
-#include <string>
-//#include <limits>
+#include <vector>
 
 class BWT final {
 private: 
-    static const wchar_t TERMINATION_SYMBOL = 0;
-    //static const int WCHAR_LIMIT = WCHAR_MAX; 
-    static const int ALPHABET_LENGTH = 2048;
+    static const unsigned char TERMINATION_SYMBOL;
 public:
-    static std::wstring encode(const std::wstring& input);
-    static std::wstring decode(const std::wstring& input);
+    static std::vector<unsigned char> encode(const std::vector<unsigned char>& input);
+    static std::vector<unsigned char> decode(const std::vector<unsigned char>& input);
     
 };

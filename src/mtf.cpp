@@ -1,47 +1,45 @@
 #include "mtf.h"
 
-std::vector<wchar_t> MTF::getAlphabet() {
-    std::vector<wchar_t> alphabet(ALPHABET_LENGTH);
-    for (wchar_t i = 0; i < ALPHABET_LENGTH; ++i) {
+#include <bitset>
+
+std::vector<unsigned char> MTF::getAlphabet() {
+    std::vector<unsigned char> alphabet(256);
+    for (unsigned char i = 0; i < 255; ++i) {
         alphabet[i] = i;
     }
+    alphabet[255] = 255;
+    
     return alphabet;
 }
 
-std::wstring MTF::encode(const std::wstring& input) {
-    std::vector<wchar_t> alphabet = getAlphabet();
+std::vector<unsigned char> MTF::encode(const std::vector<unsigned char>& input) {
+    std::vector<unsigned char> alphabet = getAlphabet();
     
-    std::wstring result;
+    std::vector<unsigned char> result;
 
-    for (int i = 0; i < input.size(); ++i) {
-        if (i != 0) {
-            result += L'\n';
-        }
+    for (size_t i = 0; i < input.size(); ++i) {
         auto it = std::find(alphabet.begin(), alphabet.end(), input[i]);
         if (it != alphabet.end()) {
-            result += std::to_wstring(std::distance(alphabet.begin(), it));
+            result.push_back(std::distance(alphabet.begin(), it));
             alphabet.erase(it);
             alphabet.insert(alphabet.begin(), input[i]);
         }
     }
-
+    
     return result;
 }
 
-std::wstring MTF::decode(const std::wstring& input) {
-    std::vector<wchar_t> alphabet = getAlphabet();
+std::vector<unsigned char> MTF::decode(const std::vector<unsigned char>& input) {
+    std::vector<unsigned char> alphabet = getAlphabet();
     
-    std::wstring result;
-
-    std::wistringstream iss(input);
-    int index;
-
-    while (iss >> index) {
-        wchar_t ch = alphabet[index];
-        result += ch;
+    std::vector<unsigned char> result(input.size());
+    size_t i = 0;
+    for (unsigned char index : input) {
+        unsigned char ch = alphabet[index];
+        result[i++] = ch;
         alphabet.erase(alphabet.begin() + index);
         alphabet.insert(alphabet.begin(), ch);
     }
-
+    
     return result;
 }

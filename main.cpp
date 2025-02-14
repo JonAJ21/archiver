@@ -6,6 +6,7 @@
 #include "rle.h"
 #include "mtf.h"
 #include "bwt.h"
+#include "huffman.h"
 #include "suffix_tree.h"
 
 std::vector<std::byte> to_bytes(const std::string& str) {
@@ -42,6 +43,9 @@ int main() {
         std::cerr << "Error: read" << std::endl;
     }
 
+    in.close();
+
+
     // for (unsigned char ch : buffer) {
     //     std::cout << ch << ' ' << (uint) ch << ' ' << std::bitset<8>(ch) << std::endl;
     // }
@@ -49,17 +53,16 @@ int main() {
     std::vector<unsigned char> encoded = BWT::encode(buffer);
     encoded = MTF::encode(encoded);
     encoded = RLE::encode(encoded);
+    encoded = Huffman::encode(encoded);
 
-    std::vector<unsigned char> decoded = RLE::decode(encoded);
+    std::vector<unsigned char> decoded = Huffman::decode(encoded);
+    decoded = RLE::decode(decoded);
     decoded = MTF::decode(decoded);
     decoded = BWT::decode(decoded);
-
-
-
-    std::cout << "size: " << buffer.size() << ' ' << encoded.size() <<' ' << decoded.size() << std::endl;
-
-
-
+ 
+    std::cout << encoded.size() << std::endl;
+    std::cout << decoded.size() << std::endl;
+    std::cout << decoded.size() / (double) encoded.size();
 
     
         
@@ -74,6 +77,8 @@ int main() {
         out_encoded << ch;
     }
 
+    out_encoded.close();
+
     std::ofstream out_decoded(output_file_decoded, std::ios_base::trunc | std::ios_base::binary);
 
     if (!out_decoded.is_open()) {
@@ -85,66 +90,23 @@ int main() {
         out_decoded << ch;
     }
 
-    in.close();
-    out_encoded.close();
     out_decoded.close();
 
-
-    // setlocale(LC_ALL, "");
-    // std::wstring command;
-    // std::wcin >> command;
-    // if (command == L"compress") {
-    //     std::wstring input;
-
-    //     std::wstring str;
-    //     // while (std::wcin >> str) {
-    //     //     input += str;
-    //     // }
-    //     std::getline(std::wcin, str);
-    //     while (std::getline(std::wcin, str)) {
-    //         input += str + L'\n';
-    //     }
-    //     input.pop_back();
-
-    //     if (input.size() == 0) {
-    //         return 0;
-    //     }
-
-    //     // std::wcout << input << std::endl;
-        
-    
-    //     std::wstring bwtOutput = BWT::encode(input);
-    //     std::wstring mtfOutput = MTF::encode(bwtOutput);
-    //     std::wstring rleOutput = RLE::encode(mtfOutput);
-
-    //     std::wcout << rleOutput << std::endl;
-
-    //     std::wcout << "================================================================" << std::endl;
-
-    //     rleOutput = RLE::decode(rleOutput);
-    //     mtfOutput = MTF::decode(rleOutput);
-    //     bwtOutput = BWT::decode(mtfOutput);
-        
-    //     std::wcout << bwtOutput << std::endl;
-
-    //     std::wcout << "================================================================" << std::endl;
-        
-    //     std::wcout << input << std::endl;
-        
-
-    // } else if (command == L"decompress") {
-    //     std::wstring input;
-    //     std::wstring str;
-    //     while (std::wcin >> str) {
-    //         input += str + L'\n';
-    //     }        
-
-    //     // std::string rleOutput = RLE::decode(input);
-    //     // std::string mtfOutput = MTF::decode(rleOutput);
-    //     // std::string bwtOutput = BWT::decode(mtfOutput);
-        
-    //     // std::cout << bwtOutput << std::endl;
+    // auto huffman = Huffman::encode(buffer);
+    // std::cout << "===============================================\n";
+    // for (auto ch : huffman) {
+    //     std::cout << std::bitset<8>(ch) << ' ';
     // }
+    // std::cout << std::endl;
+    // std::cout << "===============================================\n";
+    // auto decoded_huffman = Huffman::decode(huffman);
+
+    // for (auto ch : decoded_huffman) {
+    //     std::cout << ch;
+    // }
+    // std::cout << std::endl;
+    // std::cout << decoded_huffman.size() << std::endl;
+    
 
     return 0;
 }

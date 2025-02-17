@@ -1,5 +1,7 @@
 #include "rle.h"
 
+#include <bitset>
+
 std::vector<unsigned char> RLE::encode(const std::vector<unsigned char>& input) {
     std::vector<unsigned char> result;
 
@@ -17,11 +19,23 @@ std::vector<unsigned char> RLE::encode(const std::vector<unsigned char>& input) 
         
         i += count;
     }
+
+    for (auto ch : result) {
+        std::cout << std::bitset<8>(ch) << ' ';
+    }
+    std::cout << std::endl;
+
+
     return result;
 }
 
 std::vector<unsigned char> RLE::decode(const std::vector<unsigned char>& input) {
     std::vector<unsigned char> result;
+
+
+    // for (auto ch : input) {
+    //     std::cout << (int) ch << std::endl;
+    // }
 
     if (input.size() % 2 != 0) {
         throw std::invalid_argument("Invalid RLE encoded data");

@@ -184,6 +184,9 @@ HuffmanNode* Huffman::deserializeTree(const std::vector<unsigned char>& text, si
 std::vector<unsigned char> Huffman::encode(const std::vector<unsigned char>& input) {
     HuffmanNode* huffmanTree = buildHuffmanTree(input);
     
+    
+    std::cout << std::endl;
+
     std::unordered_map<unsigned char, std::string> huffmanCodes;
     
     buildHuffmanCodes(huffmanTree, "", huffmanCodes);
@@ -234,6 +237,12 @@ std::vector<unsigned char> Huffman::encode(const std::vector<unsigned char>& inp
 
 std::vector<unsigned char> Huffman::decode(const std::vector<unsigned char>& input) {
     
+    for (auto ch : input) {
+        std::cout << std::bitset<8>(ch) << ' ';
+    }
+    std::cout << std::endl;
+
+
     size_t* currentByteIndex = new size_t(0);
     unsigned char* bitIndex = new unsigned char('\0');
 
@@ -252,22 +261,29 @@ std::vector<unsigned char> Huffman::decode(const std::vector<unsigned char>& inp
     for (auto ch : huffmanCodes) {
         std::cout << ch.first << ' ' << (int)ch.second << std::endl;
     }
+    std::cout << std::endl;
 
 
 
     std::vector<unsigned char> result;
 
     unsigned char bitsInLastByte = input.back();
-
+    std::cout << "InputSize:" << input.size() << std::endl;
     std::string code = "";
-    for (size_t i = *currentByteIndex; i < input.size() - 2; ++i) {
+    for (size_t i = *currentByteIndex; i < input.size() - 1; ++i) {
+        // std::cout << i << ' ' << std::bitset<8>(input[i]) << std::endl;
+        // std::cout << (int)*bitIndex << std::endl;
         unsigned char j = 0;
         unsigned char jMax = 8;
         if (i == *currentByteIndex) {
             j = *bitIndex;
         }
         if (i == input.size() - 2) {
-            jMax = input[input.size() - 1];
+            std::cout << "Bits in last byte: " << (int)bitsInLastByte << std::endl;
+            jMax = bitsInLastByte;
+            if (bitsInLastByte == 0) {
+                jMax = 8;
+            }
         }
         std::bitset<8> currentByte = input[i];
         for (; j < jMax; ++j){
@@ -279,16 +295,21 @@ std::vector<unsigned char> Huffman::decode(const std::vector<unsigned char>& inp
             
             if (auto search = huffmanCodes.find(code); search != huffmanCodes.end()) {
                 result.push_back(search->second);
+                std::cout << search->first << ' ' << std::bitset<8>(search->second) << ' ' << (int)j << ' ' << (int)jMax << ' ' << (int) i << ' ' << currentByte<< std::endl;
                 code = "";
             }
         }
+
     }
+
+
+
 
     for (auto ch : result) {
         std::cout << std::bitset<8>(ch) << ' ';
     }
 
-    std::cout << "\n===================\n";
+    std::cout << "\n=================== \n" << result.size() << std::endl;
 
     if (huffmanTree) {
         huffmanTree->deleteTree();

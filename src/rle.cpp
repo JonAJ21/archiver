@@ -33,9 +33,9 @@ std::vector<unsigned char> RLE::decode(const std::vector<unsigned char>& input) 
     std::vector<unsigned char> result;
 
 
-    // for (auto ch : input) {
-    //     std::cout << (int) ch << std::endl;
-    // }
+    for (auto ch : input) {
+        std::cout << (int) ch << std::endl;
+    }
 
     if (input.size() % 2 != 0) {
         throw std::invalid_argument("Invalid RLE encoded data");

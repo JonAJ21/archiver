@@ -62,7 +62,7 @@ int main(int argc, char *argv[]) {
         size_t readedBytes = 0;
         while (readedBytes < size) {
             //uint bytesToRead = std::min(size - readedBytes, (size_t) 1024 * 1024 * 8);
-            uint bytesToRead = std::min(size - readedBytes, (size_t) 100);
+            uint bytesToRead = std::min(size - readedBytes, (size_t) 1024 * 1024 * 8);
             std::vector<unsigned char> buffer(bytesToRead);
 
             if (!in.read(reinterpret_cast<char*>(buffer.data()), bytesToRead)) {

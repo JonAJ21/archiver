@@ -9,24 +9,31 @@
 #include "huffman.h"
 #include "suffix_tree.h"
 
-std::vector<std::byte> to_bytes(const std::string& str) {
-    std::vector<std::byte> bytes(str.size());
-    std::transform(std::begin(str), std::end(str), std::back_inserter(bytes), [](char c) {
-        return std::byte(c);
-    });
-    return bytes;
-}
+int main(int argc, char *argv[]) {
+    if (argc != 4) {
+        std::cout << "There must be 3 arguments:\n 1) compress/decompress\n 2) path to input file\n 3) path to output file\n";
+    }
 
+    std::string command = argv[1];
+    std::string inputFilePath = argv[2];
+    std::string outputFilePath = argv[3];
+    
+    bool compress;
+    if (command == "compress") {
+        compress = true;
+    } else if (command == "decompress") {
+        compress = false;
+    } else {
+        std::cout << "Error: invalid command" << std::endl;
+        return 1;
+    }
 
-
-int main() {
-
-    std::string input_file_path = "../tests/input.txt";
-    std::string output_file_encoded = "../tests/output_encoded.txt";
-    std::string output_file_decoded = "../tests/output_decoded.txt";
+    // std::string input_file_path = "../tests/input.txt";
+    // std::string output_file_encoded = "../tests/output_encoded.txt";
+    // std::string output_file_decoded = "../tests/output_decoded.txt";
     
 
-    std::ifstream in(input_file_path, std::ios_base::binary);
+    std::ifstream in(inputFilePath, std::ios_base::in | std::ios_base::binary);
 
     if (!in.is_open()) {
         std::cout << "Error: input file could not open" << std::endl;
@@ -37,76 +44,92 @@ int main() {
     std::streamsize size = in.tellg();
     in.seekg(0, std::ios::beg);
 
-    std::vector<unsigned char> buffer(size);
-
-    if (!in.read(reinterpret_cast<char*>(buffer.data()), size)) {
-        std::cerr << "Error: read" << std::endl;
-    }
-
-    in.close();
-
-
-    // for (unsigned char ch : buffer) {
-    //     std::cout << ch << ' ' << (uint) ch << ' ' << std::bitset<8>(ch) << std::endl;
-    // }
-
-    std::vector<unsigned char> encoded = BWT::encode(buffer);
-    encoded = MTF::encode(encoded);
-    encoded = RLE::encode(encoded);
-    encoded = Huffman::encode(encoded);
-
-    std::vector<unsigned char> decoded = Huffman::decode(encoded);
-    decoded = RLE::decode(decoded);
-    decoded = MTF::decode(decoded);
-    decoded = BWT::decode(decoded);
- 
-    std::cout << encoded.size() << std::endl;
-    std::cout << decoded.size() << std::endl;
-    std::cout << decoded.size() / (double) encoded.size();
 
     
-        
-    std::ofstream out_encoded(output_file_encoded, std::ios_base::trunc | std::ios_base::binary);
+    std::ofstream out(outputFilePath, std::ios_base::out | std::ios_base::binary);
 
-    if (!out_encoded.is_open()) {
+    if (!out.is_open()) {
         std::cout << "Error: output file could not open" << std::endl;
         return 2;
     }
 
-    for (unsigned char ch : encoded) {
-        out_encoded << ch;
+    if (size == 0) {
+        return 0;
     }
 
-    out_encoded.close();
 
-    std::ofstream out_decoded(output_file_decoded, std::ios_base::trunc | std::ios_base::binary);
+    if (compress == true) {
+        size_t readedBytes = 0;
+        while (readedBytes < size) {
+            //uint bytesToRead = std::min(size - readedBytes, (size_t) 1024 * 1024 * 8);
+            uint bytesToRead = std::min(size - readedBytes, (size_t) 100);
+            std::vector<unsigned char> buffer(bytesToRead);
 
-    if (!out_decoded.is_open()) {
-        std::cout << "Error: output file could not open" << std::endl;
-        return 3;
+            if (!in.read(reinterpret_cast<char*>(buffer.data()), bytesToRead)) {
+                std::cout << "Error: read" << std::endl;
+                return 3;
+            }
+            readedBytes += bytesToRead;
+
+            std::vector<unsigned char> encoded = BWT::encode(buffer);
+            encoded = MTF::encode(encoded);
+            encoded = RLE::encode(encoded);
+            encoded = Huffman::encode(encoded);
+            
+            unsigned char bytes[4] = {static_cast<unsigned char>((encoded.size() >> 24) & 0xFF),
+                                      static_cast<unsigned char>((encoded.size() >> 16) & 0xFF),
+                                      static_cast<unsigned char>((encoded.size() >> 8) & 0xFF),
+                                      static_cast<unsigned char>((encoded.size()) & 0xFF)};
+            out << bytes[0];
+            out << bytes[1];
+            out << bytes[2];
+            out << bytes[3];
+
+            for (auto ch : encoded) {
+                out << ch;
+            }
+
+            std::cout << "Encoded bytes: " << readedBytes << std::endl;
+        }
+    } else {
+        size_t readedBytes = 0;
+        while (readedBytes < size) {
+            std::vector<unsigned char> bytes(4);
+            if (!in.read(reinterpret_cast<char*>(bytes.data()), 4)) {
+                std::cout << "Error: read" << std::endl;
+                return 3;
+            }
+            uint bytesToRead = (static_cast<uint>(bytes[0]) << 24) |
+                               (static_cast<uint>(bytes[1]) << 16) |
+                               (static_cast<uint>(bytes[2]) << 8)  |
+                               (static_cast<uint>(bytes[3]));
+            
+            std::vector<unsigned char> buffer(bytesToRead);
+
+            if (!in.read(reinterpret_cast<char*>(buffer.data()), bytesToRead)) {
+                std::cout << "Error: read" << std::endl;
+                return 3;
+            }
+            readedBytes += bytesToRead + 4;
+            
+            std::vector<unsigned char> decoded = Huffman::decode(buffer);
+            decoded = RLE::decode(decoded);
+            decoded = MTF::decode(decoded);
+            decoded = BWT::decode(decoded);
+
+            for (auto ch : decoded) {
+                out << ch;
+            }
+
+            std::cout << "Decoded bytes: " << readedBytes << std::endl;
+        }
     }
 
-    for (unsigned char ch : decoded) {
-        out_decoded << ch;
-    }
 
-    out_decoded.close();
 
-    // auto huffman = Huffman::encode(buffer);
-    // std::cout << "===============================================\n";
-    // for (auto ch : huffman) {
-    //     std::cout << std::bitset<8>(ch) << ' ';
-    // }
-    // std::cout << std::endl;
-    // std::cout << "===============================================\n";
-    // auto decoded_huffman = Huffman::decode(huffman);
+    in.close();
+    out.close();
 
-    // for (auto ch : decoded_huffman) {
-    //     std::cout << ch;
-    // }
-    // std::cout << std::endl;
-    // std::cout << decoded_huffman.size() << std::endl;
-    
 
     return 0;
 }

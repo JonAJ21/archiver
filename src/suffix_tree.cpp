@@ -14,7 +14,7 @@ Node::Node(Node *link, int start, int *end, int index)
       suffixIndex(index) {}
 
 
-SuffixTree::SuffixTree(const std::vector<unsigned char>& input) : text(input) {
+SuffixTree::SuffixTree(const std::vector<STSymbol>& input) : text(input) {
     buildSuffixTree();
 }
 

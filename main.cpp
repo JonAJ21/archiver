@@ -46,7 +46,7 @@ int main(int argc, char *argv[]) {
 
 
     
-    std::ofstream out(outputFilePath, std::ios_base::out | std::ios_base::binary);
+    std::ofstream out(outputFilePath, std::ios_base::out);
 
     if (!out.is_open()) {
         std::cout << "Error: output file could not open" << std::endl;
@@ -61,7 +61,6 @@ int main(int argc, char *argv[]) {
     if (compress == true) {
         size_t readedBytes = 0;
         while (readedBytes < size) {
-            //uint bytesToRead = std::min(size - readedBytes, (size_t) 1024 * 1024 * 8);
             uint bytesToRead = std::min(size - readedBytes, (size_t) 1024 * 1024 * 8);
             std::vector<unsigned char> buffer(bytesToRead);
 
@@ -70,7 +69,6 @@ int main(int argc, char *argv[]) {
                 return 3;
             }
             readedBytes += bytesToRead;
-
             std::vector<unsigned char> encoded = BWT::encode(buffer);
             encoded = MTF::encode(encoded);
             encoded = RLE::encode(encoded);

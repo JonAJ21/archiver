@@ -9,11 +9,25 @@
 struct Node;
 class SuffixTree;
 
+struct STSymbol {
+    unsigned char symbol;
+    unsigned char is_termination; // 0 -> true , 1 -> false
+
+    bool operator==(const STSymbol& other) const {
+        return symbol == other.symbol && is_termination == other.is_termination;
+    }
+
+    bool operator<(const STSymbol& other) const {
+        return symbol < other.symbol || (symbol == other.symbol && is_termination < other.is_termination);
+        //return is_termination < other.is_termination || (is_termination == other.is_termination && symbol < other.symbol);
+    }
+};
+
 struct Node {
     Node(Node *link, int start, int *end);
     Node(Node *link, int start, int *end, int ind);
     
-    std::map<unsigned char, Node*> children;
+    std::map<STSymbol, Node*> children;
     Node *suffixLink;
     int start;
     int *end;
@@ -24,7 +38,7 @@ struct Node {
 
 class SuffixTree { 
 public: 
-    SuffixTree(const std::vector<unsigned char>& input);
+    SuffixTree(const std::vector<STSymbol>& input);
     ~SuffixTree();
     std::vector<Node*> getNodesDFS();
 
@@ -33,7 +47,7 @@ private:
     Node *lastCreatedInternalNode = nullptr;
     Node *activeNode = nullptr;
     
-    std::vector<unsigned char> text;
+    std::vector<STSymbol> text;
 
     int activeEdge = -1;
     int activeLength = 0;
